@@ -1,0 +1,48 @@
+<% notice = problem.notices.first %>
+<% if notice %>
+= <%= notice.message %> = 
+<% end %>
+
+See this exception on Errbit
+<%= Rails.application.routes_url_helpers
+  .app_problem_url(app, problem, ActionMailer::Base.default_url_options)
+%>
+
+== Summary ==
+<% if notice && notice.request['url'].present? %>
+ URL:: <%= notice.request['url'] %>
+<% end %>
+ Where:: <%= problem.where %>
+ Occured:: <%= problem.created_at.to_s(:micro) %>
+ Similar:: <%= (problem.notices_count - 1).to_s %>
+
+<% if notice && notice.env_vars.present? %>
+== Environment ==
+{{{
+<%= ErrbitTracPlugin.pretty_hash(notice.env_vars) %>
+}}}
+<% end %>
+
+<% if notice && notice.params.present? %>
+== Params ==
+{{{
+<%= ErrbitTracPlugin.pretty_hash(notice.params) %>
+}}}
+<% end %>
+
+<% if notice && notice.session.present? %>
+== Session ==
+{{{
+<%= ErrbitTracPlugin.pretty_hash(notice.session) %>
+}}}
+<% end %>
+
+<% if notice && notice.backtrace_lines.present? %>
+== Backtrace ==
+{{{
+<% notice.backtrace_lines[0,10].each do |line| %><%= line.number %>:  <%= line.file_relative %> -> **<%= line.method %>**
+<% end %>
+}}}
+<% end %>
+
+
